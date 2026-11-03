@@ -1,0 +1,18 @@
+# dependencies & builds
+node_modules/
+dist/
+dist-*/
+*.zip
+
+# local env (the public build values live in .env.production)
+.env
+.env.local
+.env.*.local
+
+# secrets that must never be committed
+push-secrets.txt
+*.pem
+
+# misc
+.DS_Store
+*.log

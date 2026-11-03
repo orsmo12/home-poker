@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+/* Global type scale: one notch smaller than the browser default (everything is in rem). */
+html { font-size: 15px; }
+html, body, #root { height: 100%; }
+body {
+  @apply bg-night-950 text-slate-100 font-sans antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+input { user-select: text; -webkit-user-select: text; }
+
+@layer components {
+  /* "Frosted glass" WITHOUT backdrop-filter: a light diagonal sheen + inner highlight.
+     Real blur made Android phones flash during screen changes, so we fake the frost. */
+  .glass {
+    @apply rounded-3xl border border-white/10 shadow-glass;
+    background: linear-gradient(140deg, rgba(255,255,255,.10) 0%, rgba(255,255,255,.035) 45%, rgba(255,255,255,.06) 100%);
+  }
+  .glass-strong {
+    @apply rounded-3xl border border-white/15 shadow-glass;
+    background: linear-gradient(160deg, #1a2036 0%, #10142a 55%, #0c1022 100%);
+  }
+  .glass-pill {
+    @apply rounded-full border border-white/10;
+    background: linear-gradient(140deg, rgba(255,255,255,.12), rgba(255,255,255,.04));
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply relative inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3.5 font-bold text-night-950
+           bg-gradient-to-l from-emerald-300 to-emerald-500 shadow-glow-emerald transition
+           active:scale-[0.97] disabled:from-slate-700 disabled:to-slate-700 disabled:text-slate-400 disabled:shadow-none;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/[0.04] px-4 py-3
+           font-semibold text-slate-200 transition active:scale-[0.97]
+           hover:border-emerald-300/50 hover:shadow-glow-emerald hover:text-white;
+  }
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-l from-rose-400 to-rose-600 px-5 py-3.5
+           font-bold text-white shadow-glow-rose transition active:scale-[0.97];
+  }
+  .label { @apply mb-1.5 block text-xs font-medium tracking-wide text-slate-400; }
+  .text-input {
+    @apply w-full rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 text-lg text-white outline-none
+           placeholder:text-slate-500 focus:border-emerald-300/60 focus:shadow-glow-emerald;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar { scrollbar-width: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .tabular { font-variant-numeric: tabular-nums; }
+  .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 0.5rem); }
+  .pt-safe { padding-top: env(safe-area-inset-top); }
+  .wheel-mask {
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);
+            mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);
+  }
+}
+
+/* sweat drops: small, transform/opacity only (cheap, no layout) */
+@keyframes sweat { 0% { transform: translateY(-2px); opacity: 0 } 15% { opacity: 1 } 80% { transform: translateY(12px); opacity: .9 } 100% { transform: translateY(15px); opacity: 0 } }
+.sweat { animation: sweat 1.6s ease-in infinite; }
+@keyframes twinkle { 0%, 100% { opacity: .15 } 50% { opacity: 1 } }
+@keyframes drift { 0%, 100% { transform: translate(0, 0) } 50% { transform: translate(20px, -16px) } }
+
+/* Blur filters made Android phones flash (whole screen "disappears and comes back").
+   Turned off everywhere; surfaces use solid-enough colors instead. */
+*, *::before, *::after { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+
+/* undo toast */
+@keyframes toast-in { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+.toast-in { animation: toast-in .18s ease-out; }
+@keyframes toast-timer { from { width: 100%; } to { width: 0; } }
+.toast-timer { animation: toast-timer 5s linear forwards; }
+
+/* celebration confetti chips */
+@keyframes confetti-fall { 0% { transform: translateY(-30px) rotate(0); opacity: 1; } 100% { transform: translateY(105vh) rotate(540deg); opacity: .9; } }
+.confetti { animation-name: confetti-fall; animation-timing-function: linear; animation-iteration-count: 2; animation-fill-mode: both; }
