@@ -90,12 +90,15 @@ function Sweat({ level }) {
   );
 }
 
-export function DraggableSeat({ seat, index, ts, portrait, ratio, cur, tableRef, isTarget, onHover, onDrop, onTap, readOnly = false, entry = 0 }) {
+export function DraggableSeat({ seat, index, ts, portrait, ratio, cur, tableRef, isTarget, onHover, onDrop, onTap, readOnly = false, entry = 0, crowd = false }) {
   const [dragging, setDragging] = useState(false);
   const wasDragged = useRef(false); // a drag must not also count as a tap
   const pos = seatPoint(ts[index], portrait);
   const s = seatInfo(seat, ratio);
   const out = seat.leftEarly;
+  // Crowded phone table: seats on the round ends put the name beside the avatar (toward the felt),
+  // so it doesn't run into the next seat below.
+  const side = crowd && portrait ? (pos.x < 22 ? 'left' : pos.x > 78 ? 'right' : null) : null;
   const delta = s.stackChips !== null && !out ? s.stackChips - s.boughtChips : 0;
   // Entries = money in ÷ entry size (one 150₪ buy-in at 50₪ a seat counts as 3).
   const entries = entry > 0 ? Math.max(1, Math.round(s.buyIn / entry)) : seat.transactions.length;
@@ -163,11 +166,11 @@ export function DraggableSeat({ seat, index, ts, portrait, ratio, cur, tableRef,
         whileDrag={{ scale: 1.15 }}
         whileTap={readOnly ? undefined : { scale: 0.94 }}
         className={`absolute flex flex-col items-center ${readOnly ? '' : 'cursor-grab active:cursor-grabbing'}`}
-        style={{ left: portrait ? -40 : -46, top: portrait ? -24 : -32, width: portrait ? 80 : 92, touchAction: 'none' }}
+        style={{ left: portrait ? (crowd ? -32 : -40) : -46, top: portrait ? (crowd ? -19 : -24) : -32, width: portrait ? (crowd ? 64 : 80) : 92, touchAction: 'none' }}
         data-seat={seat.name}
       >
         <div ref={avatarRef} className={`relative rounded-full transition-shadow ${isTarget ? 'shadow-[0_0_0_3px_rgba(34,211,238,.9),0_0_26px_rgba(34,211,238,.8)]' : 'shadow-[0_4px_12px_rgba(0,0,0,.6)]'}`}>
-          <ChipAvatar avatar={seat.avatar} chip={seat.chip ?? index} color={seat.glow} size={portrait ? 34 : 46} dim={out} />
+          <ChipAvatar avatar={seat.avatar} chip={seat.chip ?? index} color={seat.glow} size={portrait ? (crowd ? 27 : 34) : (crowd ? 40 : 46)} dim={out} />
           {seat.link && (
             <span title="חשבון משותף" className="absolute -right-1 -top-1 flex h-[18px] w-[18px] items-center justify-center rounded-full border-2 border-night-950 text-night-950"
               style={{ background: linkColor(seat.link), boxShadow: `0 0 8px ${linkColor(seat.link)}` }}><Link2 size={10} strokeWidth={3} /></span>
@@ -179,14 +182,15 @@ export function DraggableSeat({ seat, index, ts, portrait, ratio, cur, tableRef,
             </span>
           )}
         </div>
-        <div className={`mt-0.5 max-w-full truncate font-bold leading-tight text-white drop-shadow-[0_1px_4px_rgba(0,0,0,.9)] ${portrait ? 'text-[12px]' : 'text-[13px]'}`}>{seat.name}</div>
-        <div className={`mt-0.5 whitespace-nowrap rounded-full border border-white/10 bg-black/55 leading-tight ${portrait ? 'px-1.5 py-px text-[10px]' : 'px-2 py-0.5 text-[11px]'}`}>
+        <div className={`mt-0.5 max-w-full truncate font-bold leading-tight text-white drop-shadow-[0_1px_4px_rgba(0,0,0,.9)] ${portrait ? (crowd ? 'text-[10.5px]' : 'text-[12px]') : 'text-[13px]'}`}
+          style={side ? { position: 'absolute', top: pos.y < 40 ? 32 : pos.y > 60 ? -4 : 9, [side]: 54, maxWidth: 58, marginTop: 0, zIndex: 2 } : undefined}>{seat.name}</div>
+        {!(crowd && portrait && !out) && <div className={`mt-0.5 whitespace-nowrap rounded-full border border-white/10 bg-black/55 leading-tight ${portrait ? 'px-1.5 py-px text-[10px]' : 'px-2 py-0.5 text-[11px]'}`}>
           {out
             ? <span className={`font-bold ${netTone(s.netC)}`}>יצא <M v={fromCents(s.netC)} signed cur={cur} /></span>
-            : portrait
+            : portrait || crowd
               ? <M v={s.buyIn} cur={cur} className="font-bold text-white" />
               : <span className="text-slate-200"><M v={s.buyIn} cur={cur} className="font-bold text-white" /> · <Chips v={s.shownChips} className="text-amber-200" /></span>}
-        </div>
+        </div>}
       </motion.div>
     </motion.div>
   );

@@ -144,7 +144,7 @@ export function PokerTable({ game, maxSeats, cur, onSeatTap, onAddPlayer, onArra
         {game.seats.map((seat, i) => (
           <DraggableSeat key={seat.id} seat={seat} index={i} ts={ts} portrait={portrait}
             ratio={game.chipsPerUnit} cur={cur} tableRef={tableRef}
-            isTarget={hover?.type === 'swap' && hover.j === i} onHover={setHover} onDrop={drop} onTap={() => onSeatTap?.(seat.id)} readOnly={readOnly} entry={Number(game.entry) || entry} />
+            isTarget={hover?.type === 'swap' && hover.j === i} onHover={setHover} onDrop={drop} onTap={() => onSeatTap?.(seat.id)} readOnly={readOnly} entry={Number(game.entry) || entry} crowd={game.seats.length > 10} />
         ))}
       </div>
 

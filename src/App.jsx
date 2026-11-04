@@ -188,7 +188,7 @@ function SettingsPanel({ state, dispatch }) {
           </div>
           <div>
             <div className="label text-center">מספר כיסאות מקסימלי</div>
-            <WheelPicker visible={3} items={[2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => ({ value: n, label: n }))}
+            <WheelPicker visible={3} items={Array.from({ length: 15 }, (_, i) => i + 2).map((n) => ({ value: n, label: n }))}
               value={state.settings.maxSeats} onChange={(n) => dispatch({ type: 'SETTINGS_UPDATE', patch: { maxSeats: n } })} ariaLabel="מספר כיסאות" />
           </div>
           {analyticsConfigured && (
