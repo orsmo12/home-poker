@@ -36,16 +36,27 @@ export function Celebration({ record, history, players, cur, onClose }) {
     return out.slice(0, 3);
   }, [record, history, winner, pot]);
 
+  // phone numbers of whoever receives money, so everyone knows where to send it
+  const phoneOf = (id) => players?.[id]?.phone || record.results.find((r) => r.playerId === id)?.phone;
+  const local = (ph) => (ph.startsWith('+972') ? `0${ph.slice(4)}` : ph);
+
   const share = async () => {
     const medal = ['🥇', '🥈', '🥉'];
+    const transfers = record.settlements || [];
+    const seen = new Set();
+    const phones = transfers.filter((p) => !seen.has(p.toId) && seen.add(p.toId))
+      .map((p) => { const ph = phoneOf(p.toId); return ph ? `${p.toMembers ? p.toMembers[0] : p.to} ${local(ph)}` : null; })
+      .filter(Boolean);
     const text = [
-      `🃏 ${record.name || 'ערב פוקר'} נסגר!`,
+      `🃏 ${record.name || 'ערב פוקר'} נסגר! · ${new Date(record.endedAt || Date.now()).toLocaleDateString('he-IL')}`,
       ...ranked.slice(0, 3).map((r, i) => `${medal[i]} ${r.name} ${r.net > 0 ? '+' : ''}${numFmt(r.net)}${cur}`),
       `💰 קופה: ${numFmt(pot)}${cur}`,
       ...badges.map((b) => `${b.e} ${b.t}`),
+      ...(transfers.length ? ['', '💸 העברות:', ...transfers.map((p) => `• ${p.from} ← ${p.fromMembers ? 'מעבירים' : 'מעביר'} ל${p.to} ${numFmt(p.amount)}${cur}`)] : []),
+      ...(phones.length ? ['', '📱 מספרי טלפון להעברות:', ...phones] : []),
       '', `מנהלים את הערבים ב-Home Poker: ${APP_URL}`,
     ].join('\n');
-    track('night_shared', { badges: badges.length });
+    track('night_shared', { badges: badges.length, transfers: transfers.length, phones: phones.length });
     if (navigator.share) { try { await navigator.share({ text }); return; } catch { /* cancelled */ } }
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
   };

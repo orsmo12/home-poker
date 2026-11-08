@@ -17,7 +17,6 @@ import { Celebration } from './components/Celebration';
 import { EXPENSE_KINDS } from './components/Expenses';
 import { InvitePopup, Onboarding, PushPrompt } from './components/Engagement';
 import { validateZeroSum } from './state/store';
-import { WheelPicker } from './components/WheelPicker';
 import { APP_VERSION, analyticsConfigured, isOptedOut, setOptOut, track } from './lib/analytics';
 
 const TABS = [
@@ -185,11 +184,6 @@ function SettingsPanel({ state, dispatch }) {
             <div className="label">כניסה וצ'יפים</div>
             <BuyInSetup settings={state.settings} dispatch={dispatch} />
             {state.activeGame && <p className="mt-2 text-xs text-slate-500">במשחק הנוכחי היחס כבר נעול, ולכן שינוי כאן ישפיע רק מהמשחק הבא.</p>}
-          </div>
-          <div>
-            <div className="label text-center">מספר כיסאות מקסימלי</div>
-            <WheelPicker visible={3} items={Array.from({ length: 15 }, (_, i) => i + 2).map((n) => ({ value: n, label: n }))}
-              value={state.settings.maxSeats} onChange={(n) => dispatch({ type: 'SETTINGS_UPDATE', patch: { maxSeats: n } })} ariaLabel="מספר כיסאות" />
           </div>
           {analyticsConfigured && (
             <label className="flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-3">

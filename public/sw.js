@@ -1,6 +1,6 @@
 /* Service worker: offline-first for the app, runtime caching for fonts.
  * Bump VERSION whenever you deploy a new build so phones pick up the update. */
-const VERSION = 'hpm-v34';
+const VERSION = 'hpm-v35';
 const SHELL = [
   './',
   './index.html',

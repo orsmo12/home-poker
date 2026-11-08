@@ -117,7 +117,7 @@ export default function ViewerApp() {
               </span>
             </div>
 
-            <PokerTable game={game} cur={cur} maxSeats={99} readOnly />
+            <PokerTable game={game} cur={cur} readOnly />
 
             <div className="grid grid-cols-2 gap-2">
               <StatTile label="סה״כ קניות"><M v={v.totalBuyIn} cur={cur} /></StatTile>

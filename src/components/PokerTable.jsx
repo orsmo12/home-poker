@@ -90,12 +90,11 @@ function FeltCenter({ small, name, groupName, pot, cur }) {
   );
 }
 
-export function PokerTable({ game, maxSeats, cur, onSeatTap, onAddPlayer, onArrange, readOnly = false, entry = 0 }) {
+export function PokerTable({ game, cur, onSeatTap, onAddPlayer, onArrange, readOnly = false, entry = 0 }) {
   const dragHint = useHint('drag', 4);
   const portrait = useIsNarrow();
   const tableRef = useRef(null);
   const [hover, setHover] = useState(null);
-  const full = game.seats.length >= maxSeats;
   const g = portrait ? TABLE.portrait : TABLE.wide;
   const ts = seatTs(game.seats);
   const drop = (i, h) => {
@@ -150,9 +149,9 @@ export function PokerTable({ game, maxSeats, cur, onSeatTap, onAddPlayer, onArra
 
       {readOnly ? <div className="h-12 sm:h-10" /> : (
       <div className="mt-14 flex flex-col items-center gap-2 sm:mt-12">
-        <motion.button whileTap={{ scale: 0.95 }} onClick={onAddPlayer} disabled={full}
+        <motion.button whileTap={{ scale: 0.95 }} onClick={onAddPlayer}
           className="btn-ghost border-emerald-300/40 px-6 text-emerald-100 shadow-glow-emerald disabled:opacity-40">
-          <UserPlus size={18} /> {full ? 'השולחן מלא' : 'הוסף שחקן'}
+          <UserPlus size={18} /> הוסף שחקן
         </motion.button>
         {game.seats.length > 1 && dragHint && (
           <div className="flex items-center gap-1.5 text-[11px] text-slate-400">

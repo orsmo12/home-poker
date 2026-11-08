@@ -533,7 +533,7 @@ function TableView({ state, dispatch }) {
         <LongNightNudge game={game} dispatch={dispatch} />
         <LinkPrompts game={game} state={state} cloud={cloud} dispatch={dispatch} />
         <TableToolbar game={game} settings={settings} v={v} dispatch={dispatch} cloud={cloud} />
-        <PokerTable game={game} cur={cur} maxSeats={settings.maxSeats} entry={gameEntry(game, settings)}
+        <PokerTable game={game} cur={cur} entry={gameEntry(game, settings)}
           onSeatTap={(id) => setSheet(id)} onAddPlayer={() => setSheet('add')}
           onArrange={(positions) => dispatch({ type: 'SET_POSITIONS', positions })} />
         {game.seats.length === 0 && <p className="mt-3 text-center text-sm text-slate-400">לחצו על <b className="text-white">הוסף שחקן</b> במרכז השולחן.</p>}
