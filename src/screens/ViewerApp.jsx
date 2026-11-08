@@ -3,7 +3,7 @@
  *   #snap=DATA   → a frozen snapshot carried inside the link (no server needed).
  * It never reads or writes this device's own games. */
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, Check, Eye, Radio, Trophy, UserPlus, X } from 'lucide-react';
+import { ArrowLeft, Check, Eye, Home, PlayCircle, Radio, Trophy, UserPlus, X } from 'lucide-react';
 import { PokerTable } from '../components/PokerTable';
 import { ChipAvatar } from '../components/Avatar';
 import { Chips, M, StatTile, netTone } from '../components/ui';
@@ -73,6 +73,9 @@ export default function ViewerApp() {
       try { window.localStorage.setItem('hpm-return-view', JSON.stringify({ token: shared.token, at: Date.now(), name: snap?.nm || shared.group?.name || '' })); } catch { /* blocked */ }
     }
   };
+  // Anyone can run their own night without an account: the app is fully local-first.
+  const homeUrl = appBaseUrl();
+  const goHome = (where) => () => { rememberReturn(); track('viewer_to_home', { where, ended: !!snap?.end, mode: shared.mode }); };
   const ctaUrl = cloudConfigured
     ? `${appBaseUrl()}${shared.group?.invite_code ? `?join=${shared.group.invite_code}` : '?cloud=1'}`
     : appBaseUrl();
@@ -83,10 +86,14 @@ export default function ViewerApp() {
       <header className="pt-safe sticky top-0 z-40 border-b border-white/[0.06] bg-night-950">
         <div className="mx-auto flex max-w-3xl items-center gap-2 px-4 py-3">
           <img src="./logo.svg" alt="" className="h-8 w-8" />
-          <span className="text-lg font-black tracking-tight text-white">Home <span className="text-emerald-300">Poker</span></span>
-          <span className="mr-auto flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1 text-[11px] font-semibold text-slate-300">
-            <Eye size={13} /> צפייה בלבד
+          <span className="whitespace-nowrap text-lg font-black tracking-tight text-white">Home <span className="text-emerald-300">Poker</span></span>
+          <span className="mr-auto flex items-center gap-1.5 whitespace-nowrap rounded-full border border-white/10 bg-white/[0.05] px-2.5 py-1 text-[11px] font-semibold text-slate-300" aria-label="צפייה בלבד">
+            <Eye size={13} /> <span className="hidden min-[390px]:inline">צפייה בלבד</span>
           </span>
+          <a href={homeUrl} onClick={goHome('header')} data-testid="viewer-home"
+            className="flex items-center gap-1.5 whitespace-nowrap rounded-full border border-emerald-300/40 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-bold text-emerald-100">
+            <Home size={13} /> משחק משלכם
+          </a>
         </div>
       </header>
 
@@ -96,6 +103,7 @@ export default function ViewerApp() {
           <div className="glass mx-auto mt-10 max-w-sm p-6 text-center">
             <h2 className="text-xl font-black text-white">הקישור לא זמין</h2>
             <p className="mt-2 text-sm text-slate-400">ייתכן שהמשחק נגמר מזמן או שהקישור נקטע. בקשו מהמארח קישור חדש.</p>
+            <a href={homeUrl} onClick={goHome('bad')} className="btn-ghost mt-4 inline-flex"><Home size={16} /> למסך הבית</a>
           </div>
         )}
 
@@ -116,6 +124,16 @@ export default function ViewerApp() {
                 {snap.ph === 'playing' ? 'משחקים' : snap.ph === 'cashout' ? 'סופרים צ׳יפים' : 'סליקה'}
               </span>
             </div>
+
+            {snap.end && (
+              <div className="glass flex items-center gap-3 border-emerald-300/30 p-4" data-testid="viewer-ended">
+                <div className="min-w-0 flex-1">
+                  <div className="font-black text-white">הערב נסגר! רוצים לנהל את הערב הבא?</div>
+                  <p className="text-xs text-slate-400">קניות, ספירת צ׳יפים וסליקה אוטומטית. בלי הרשמה.</p>
+                </div>
+                <a href={homeUrl} onClick={goHome('ended')} className="btn-primary shrink-0 px-3 py-2.5 text-sm"><PlayCircle size={16} /> התחילו משחק</a>
+              </div>
+            )}
 
             <PokerTable game={game} cur={cur} readOnly />
 
@@ -163,6 +181,7 @@ export default function ViewerApp() {
               <p className="truncate text-[11px] text-slate-300">
                 {shared.group?.name ? `הצטרפו ל"${shared.group.name}", עצבו את הדמות שלכם ועקבו אחרי הסטטיסטיקה` : 'צרו משתמש בחינם, עצבו את הדמות שלכם ועקבו אחרי הרווחים'}
               </p>
+              <a href={homeUrl} onClick={goHome('cta')} className="text-[11px] font-semibold text-emerald-300 underline underline-offset-2">או התחילו משחק בלי משתמש</a>
             </div>
             <a href={ctaUrl} onClick={() => { rememberReturn(); track('viewer_cta_clicked', { group: !!shared.group }); }}
               className="btn-primary shrink-0 px-3 py-2.5 text-sm"><UserPlus size={16} /> {cloudConfigured ? 'הצטרפות' : 'פתיחה'}</a>
