@@ -10,7 +10,7 @@ import { APP_URL, track } from '../lib/analytics';
 const potOf = (h) => h.results.reduce((a, r) => a + (Number(r.buyIn) || 0), 0);
 const CONFETTI = ['#34d399', '#fbbf24', '#f472b6', '#60a5fa', '#fb7185', '#a78bfa'];
 
-export function Celebration({ record, history, players, cur, onClose }) {
+export function Celebration({ record, history, players, liveUrl, cur, onClose }) {
   const ranked = [...record.results].sort((a, b) => b.net - a.net);
   const winner = ranked[0];
   const pot = potOf(record);
@@ -41,20 +41,16 @@ export function Celebration({ record, history, players, cur, onClose }) {
   const local = (ph) => (ph.startsWith('+972') ? `0${ph.slice(4)}` : ph);
 
   const share = async () => {
-    const medal = ['🥇', '🥈', '🥉'];
     const transfers = record.settlements || [];
     const seen = new Set();
     const phones = transfers.filter((p) => !seen.has(p.toId) && seen.add(p.toId))
       .map((p) => { const ph = phoneOf(p.toId); return ph ? `${p.toMembers ? p.toMembers[0] : p.to} ${local(ph)}` : null; })
       .filter(Boolean);
     const text = [
-      `🃏 ${record.name || 'ערב פוקר'} נסגר! · ${new Date(record.endedAt || Date.now()).toLocaleDateString('he-IL')}`,
-      ...ranked.slice(0, 3).map((r, i) => `${medal[i]} ${r.name} ${r.net > 0 ? '+' : ''}${numFmt(r.net)}${cur}`),
-      `💰 קופה: ${numFmt(pot)}${cur}`,
-      ...badges.map((b) => `${b.e} ${b.t}`),
-      ...(transfers.length ? ['', '💸 העברות:', ...transfers.map((p) => `• ${p.from} ← ${p.fromMembers ? 'מעבירים' : 'מעביר'} ל${p.to} ${numFmt(p.amount)}${cur}`)] : []),
+      `🃏 הסליקה של הערב${record.name ? ` ב"${record.name}"` : ''} · ${new Date(record.endedAt || Date.now()).toLocaleDateString('he-IL')}`, '',
+      ...transfers.map((p) => `• ${p.from} ← ${p.fromMembers ? 'מעבירים' : 'מעביר'} ל${p.to} ${numFmt(p.amount)}${cur}`),
       ...(phones.length ? ['', '📱 מספרי טלפון להעברות:', ...phones] : []),
-      '', `מנהלים את הערבים ב-Home Poker: ${APP_URL}`,
+      '', '👀 צפו בסליקה, הצטרפו לשולחן שלנו ועקבו אחרי הסטטיסטיקה שלכם לאורך זמן:', liveUrl || APP_URL,
     ].join('\n');
     track('night_shared', { badges: badges.length, transfers: transfers.length, phones: phones.length });
     if (navigator.share) { try { await navigator.share({ text }); return; } catch { /* cancelled */ } }

@@ -3,9 +3,9 @@ import { RotateCcw } from 'lucide-react';
 import { buzz } from './lib/haptics';
 import { motion } from 'framer-motion';
 import { Calculator, Coins, Download, LineChart, Radio, Share, UserRound, X } from 'lucide-react';
-import { fetchLive } from './cloud/live';
+import { fetchLive, getLiveSession } from './cloud/live';
 import { CloudProvider, useCloud } from './cloud/CloudProvider';
-import { cloudConfigured } from './cloud/config';
+import { appBaseUrl, cloudConfigured } from './cloud/config';
 import { CloudScreen } from './screens/CloudScreen';
 import { useAppState } from './state/store';
 import { GameScreen, BuyInSetup } from './screens/GameScreen';
@@ -154,7 +154,7 @@ export default function App() {
     const label = UNDO_LABEL[a?.type];
     const before = stateRef.current.activeGame;
     if (label && before) setUndo({ id: Date.now(), label: label(a, before), game: before });
-    if (a?.type === 'FINISH') setCelebrate({ record: a.record, history: stateRef.current.history, players: stateRef.current.players });
+    if (a?.type === 'FINISH') { const live = getLiveSession(); setCelebrate({ record: a.record, history: stateRef.current.history, players: stateRef.current.players, liveUrl: live?.gameId === a.record.id && live.token ? `${appBaseUrl()}?view=${live.token}` : null }); }
     else if (a?.type === 'SET_PHASE' || a?.type === 'FINISH' || a?.type === 'DISCARD' || a?.type === 'GAME_START') setUndo(null);
     rawDispatch(a);
   }, [rawDispatch]);
